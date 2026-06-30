@@ -34,6 +34,11 @@ public class ShortestPath {
         }
     }
 
+    private void addDirectedEdge(int from, int to, int weight) {
+        // We assume the edge will connect two existing nodes!
+        nodes[from].addEdge(to, weight);
+    }
+
     class Node {
         int index;
         List<Edge> edges = new LinkedList<>();
@@ -41,17 +46,19 @@ public class ShortestPath {
         Node() {
         }
 
-        void addEdge(int to) {
-            edges.add(new Edge(index, to));
+        void addEdge(int to, int weight) {
+            edges.add(new Edge(index, to, weight));
         }
     }
 
     class Edge {
         int from;
         int to;
-        Edge(int from, int to) {
+        int weight;
+        Edge(int from, int to, int weight) {
             this.from = from;
             this.to = to;
+            this.weight = weight;
         }
     }
 }
