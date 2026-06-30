@@ -5,23 +5,32 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ShortestPath {
-    ShortestPath() {
-
-    }
-
-
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         // We will assume the meta data contains: n, m, q, and s
         String[] metaData = reader.readLine().split(" ");
         int n = Integer.parseInt(metaData[0]); // Nodes
+        // Create the empty graph
+        ShortestPath graph = new ShortestPath(n);
         int e = Integer.parseInt(metaData[1]); // The number of edges
         int q = Integer.parseInt(metaData[2]); // Number of queries
         int s = Integer.parseInt(metaData[3]); // The index of the starting node
 
         for(int i = 0; i < e; i++) {
 
+        }
+    }
+
+    private final Node[] nodes;
+    ShortestPath(int n) {
+        nodes = new Node[n];
+        initialiseNodes();
+    }
+
+    private void initialiseNodes(){
+        for (int i = 0; i < nodes.length; i++) {
+            nodes[i] = new Node();
         }
     }
 
