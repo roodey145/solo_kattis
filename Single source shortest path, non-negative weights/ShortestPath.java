@@ -7,22 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-public class ShortestPath {
-    private static boolean  firstCase = true;
-    
+public class ShortestPath {    
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        while(reader.ready() || firstCase) {
-            handleOneCase(reader);
-            firstCase = false;
-        }
+        while(handleOneCase(reader)) {}
     }
 
-    private static void handleOneCase(BufferedReader reader)  throws IOException {
+    private static boolean handleOneCase(BufferedReader reader)  throws IOException {
         // We will assume the meta data contains: n, m, q, and s
-        String[] metaData = reader.readLine().split(" ");
-        if(metaData.length == 0) return; // In case there is no more cases
+        String line = reader.readLine();
+        if (line == null)
+            return false; // In case there is no more cases
+
+        String[] metaData = line.split(" ");
         int n = Integer.parseInt(metaData[0]); // Nodes
         int e = Integer.parseInt(metaData[1]); // The number of edges
         int q = Integer.parseInt(metaData[2]); // Number of queries
@@ -48,6 +46,8 @@ public class ShortestPath {
             to = Integer.parseInt(reader.readLine());
             graph.printShortestPath(to);
         }
+
+        return true;
     }
 
     private final Node[] nodes;
@@ -82,7 +82,7 @@ public class ShortestPath {
         Node curNode;
 
         // Inidcate that the start point is visited
-        shortestPathTreeMap.put(0, 0);
+        shortestPathTreeMap.put(startPoint, 0);
         nodes[startPoint].visited = true;
 
         addNodeEdges(nodes[startPoint], pq, 0);
@@ -97,6 +97,8 @@ public class ShortestPath {
             addNodeEdges(curNode, pq, next.getWeight());
 
             shortestPathTreeMap.put(next.to, next.getWeight());
+
+            curNode.visited = true;
         }
     }
 
