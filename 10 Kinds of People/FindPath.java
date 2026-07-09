@@ -9,26 +9,81 @@ import java.util.Set;
 
 public class FindPath {
     private static FindPath _instance = new FindPath();
+    private static Exercise1DisjointSetA unions;
+    private static boolean[][] map;
 
     public static void main(String[] args) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String[] mapMetaData = reader.readLine().split(" ");
         int rows = Integer.parseInt(mapMetaData[0]);
         int cols = Integer.parseInt(mapMetaData[1]);
-        Exercise1DisjointSetA unions = _instance.new Exercise1DisjointSetA(rows * cols);
-        boolean[][] map = new boolean[rows][cols];
+        unions = _instance.new Exercise1DisjointSetA(rows * cols);
+        map = new boolean[rows][cols];
+        Queue<Point> zerosQueue = new ArrayDeque<>();
+        Queue<Point> onesQueue = new ArrayDeque<>();
         String line;
         for (int r = 0; r < rows; r++) {
             line = reader.readLine();
             for (int c = 0; c < cols; c++) {
                 map[r][c] = line.charAt(c) == '1'; // Ones = true and zeros = false
+                if(map[r][c]) {
+                    onesQueue.add(new Point(r, c));
+                } else {
+                    zerosQueue.add(new Point(r, c));
+                }
             }
         }
 
+        exploreQueue(zerosQueue);
+        exploreQueue(onesQueue);
+
         int queries = Integer.parseInt(reader.readLine());
         for (int i = 0; i < queries; i++) {
-            handleQuery(map, reader, unions);
+            String[] tripMetaData = reader.readLine().split(" ");
+            // Subtract 1 because the input gives location from 1 to r and 1 to c
+            int sr = Integer.parseInt(tripMetaData[0]) - 1;
+            int sc = Integer.parseInt(tripMetaData[1]) - 1;
+            int er = Integer.parseInt(tripMetaData[2]) - 1;
+            int ec = Integer.parseInt(tripMetaData[3]) - 1;
+            Integer startCityID = getCityID(map, new Point(sr, sc));
+            Integer endCityID = getCityID(map, new Point(er, ec));
+            // handleQuery(map, reader, unions);
+            if(unions.query(startCityID, endCityID)) {
+                print(map[sr][sc]);
+            } else {
+                System.out.println("neither");
+            }
         }
+    }
+
+    private static void exploreQueue(Queue<Point> queue) throws Exception {
+        Point nextCity;
+        Point surCity;
+        while (!queue.isEmpty()) {
+            nextCity = queue.poll(); // Next element to be visited
+            // Get surrounding elements
+            // Top city
+            surCity = new Point(nextCity.x - 1, nextCity.y);
+            if (withinBoundaries(surCity, map) && map[surCity.x][surCity.y] == map[nextCity.x][nextCity.y]) {
+                unions.union(getCityID(map, surCity), getCityID(map, nextCity));
+            }
+            // Bottom city
+            surCity = new Point(nextCity.x + 1, nextCity.y);
+            if (withinBoundaries(surCity, map) && map[surCity.x][surCity.y] == map[nextCity.x][nextCity.y]) {
+                unions.union(getCityID(map, surCity), getCityID(map, nextCity));
+            }
+            // Right city
+            surCity = new Point(nextCity.x, nextCity.y + 1);
+            if (withinBoundaries(surCity, map) && map[surCity.x][surCity.y] == map[nextCity.x][nextCity.y]) {
+                unions.union(getCityID(map, surCity), getCityID(map, nextCity));
+            }
+            // Left city
+            surCity = new Point(nextCity.x, nextCity.y - 1);
+            if (withinBoundaries(surCity, map) && map[surCity.x][surCity.y] == map[nextCity.x][nextCity.y]) {
+                unions.union(getCityID(map, surCity), getCityID(map, nextCity));
+            }
+        }
+
     }
 
     // This method assumes that start location is not the same as the end location
