@@ -14,8 +14,9 @@ public class PriorityQueue {
 
     private static void handleCase() throws IOException {
         int people = Integer.parseInt(_reader.readLine());
+        String[] personMetaData;
         for(int i = 0; i < people; i++) {
-            
+            personMetaData = _reader.readLine().replace(" class", "").split(": ");
         }
     }
 }
