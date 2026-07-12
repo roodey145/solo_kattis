@@ -36,11 +36,12 @@ public class PriorityQueue {
         int statusClassBase;
         for(int i = 0; i < _MAX_CLASSES_LENGTH; i++) {
             if(statusArr.length > i) {
-                statusClassBase = statusBase(statusArr[i]);
+                statusClassBase = statusBase(statusArr[statusArr.length - 1 - i]);
             } else {
                 statusClassBase = 2;
             }
-            status += Math.pow(statusClassBase, _MAX_CLASSES_LENGTH - i);
+            // status += Math.pow(statusClassBase, _MAX_CLASSES_LENGTH - i);
+            status = status * 3 + statusClassBase;
         }
 
         return status;
@@ -66,7 +67,13 @@ public class PriorityQueue {
 
         @Override
         public int compareTo(Person o) {
-            return Integer.compare(o.status, status);
+            int results =  Integer.compare(o.status, status);
+
+            if(results == 0) {
+                return name.compareTo(o.name);
+            }
+
+            return results;
         }
     }
 }
