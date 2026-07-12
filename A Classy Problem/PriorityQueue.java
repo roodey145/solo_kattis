@@ -19,4 +19,18 @@ public class PriorityQueue {
             personMetaData = _reader.readLine().replace(" class", "").split(": ");
         }
     }
+
+    class Person implements Comparable<Person> {
+        String name;
+        int status;
+        Person(String name, int status) {
+            this.name = name;
+            this.status = status;
+        }
+
+        @Override
+        public int compareTo(Person o) {
+            return Integer.compare(status, o.status);
+        }
+    }
 }
