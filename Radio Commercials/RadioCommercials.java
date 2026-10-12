@@ -1,0 +1,36 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.stream.Stream;
+
+public class RadioCommercials {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Integer[] commercialData = getNextIntegers(reader);
+
+        int commercialBreaks = commercialData[0];
+        int commercialPrice = commercialData[1];
+
+        Integer[] listener = getNextIntegers(reader);
+        int best = 0;
+        int current = 0;
+        for(int i = 0; i < commercialBreaks; i++) {
+            // Check if the current commercial break will be profitable
+            if(listener[i] + current >= commercialPrice) {
+                current += listener[i] - commercialPrice;
+                // Update the best profiting window
+                best = current > best ? current : best;
+            } else {
+                // Reset the current sum to start a new window
+                current = 0; 
+            }
+        }
+        System.out.println(best);
+    }
+
+
+    public static Integer[] getNextIntegers(BufferedReader reader) throws IOException {
+        return Stream.of(reader.readLine().split(" ")).map(element -> Integer.valueOf(element))
+                .toArray(Integer[]::new);
+    }
+}
