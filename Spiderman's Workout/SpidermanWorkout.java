@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class SpidermanWorkout {
     private static SpidermanWorkout instance = new SpidermanWorkout();
-    private static long[][] cache;
+    private static Result[][] cache;
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -20,25 +20,25 @@ public class SpidermanWorkout {
         String[] jumpsStrArr = reader.readLine().split(" ");
         int[] jumpsArr = new int[jumps];
         int maxPossibleHeight = 0;
-        for(int i = 0; i < jumps; i++) {
+        for (int i = 0; i < jumps; i++) {
             jumpsArr[i] = Integer.parseInt(jumpsStrArr[i]);
             maxPossibleHeight += jumpsArr[i];
         }
 
-        cache = new long[jumps + 1][maxPossibleHeight + 1];
+        cache = new Result[jumps + 1][maxPossibleHeight + 1];
 
-        for (long[] row : cache) {
-            Arrays.fill(row, -1);
-        }
+        // for (Result[] row : cache) {
+        // Arrays.fill(row, -1);
+        // }
 
         Result result = lowestHeight(jumpsArr, 0, instance.new Result());
-        if(!result.completed) {
+        if (!result.completed) {
             System.out.println("IMPOSSIBLE");
             return;
         }
         // System.out.println(result.highestJump + 2);
-        for(int i = jumps - 1; i >= 0; i--) {
-            if((result.sequence & (1L << i)) == 0) {
+        for (int i = jumps - 1; i >= 0; i--) {
+            if ((result.sequence & (1L << i)) == 0) {
                 System.out.print("U");
             } else {
                 System.out.print("D");
@@ -54,10 +54,20 @@ public class SpidermanWorkout {
         }
 
         // Check if this i with that height has been cached/explored befroe
-        if(cache[i][res.curHeight] != -1) {
-            return res;
+        if (cache[i][res.curHeight] != null) {
+            if(cache[i][res.curHeight].highestJump > res.highestJump){
+                // Copy the sequences from i to len(jumps)-1
+                long seq = 0;
+                for(int s = i; s < jumps.length; s++){
+                    seq += (1<<s);
+                }
+                seq &= cache[i][res.curHeight].sequence;
+                res.sequence += seq;
+                res.completed = cache[i][res.curHeight].completed;
+                cache[i][res.curHeight] = res;
+            }
+            return cache[i][res.curHeight];
         }
-        
 
         int curJump = jumps[i];
         // Jump up
@@ -66,9 +76,6 @@ public class SpidermanWorkout {
         jumpUpResult.highestJump = Integer.max(jumpUpResult.highestJump, jumpUpResult.curHeight);
         jumpUpResult.sequence += 1L << i;
         jumpUpResult = lowestHeight(jumps, i + 1, jumpUpResult);
-        // Cache current height
-        cache[i][res.curHeight] = jumpUpResult.sequence;
-
 
         // Jump down
         Result jumpDownResult = jumpUpResult;
@@ -77,15 +84,21 @@ public class SpidermanWorkout {
             jumpDownResult.curHeight -= curJump;
             jumpDownResult.highestJump = Integer.max(jumpDownResult.highestJump, jumpDownResult.curHeight);
             jumpDownResult = lowestHeight(jumps, i + 1, jumpDownResult);
-            // Cache current height
-            cache[i][res.curHeight] = jumpUpResult.sequence;
-            
+
         }
 
-        if(!jumpDownResult.completed) return jumpUpResult;
-        if(!jumpUpResult.completed) return  jumpDownResult;
+        if (!jumpDownResult.completed) {
+            // Cache best height sequence
+            cache[i][res.curHeight] = jumpUpResult;
+            return jumpUpResult;
+        }
+        if (!jumpUpResult.completed) {
+            // Cache best height sequence
+            cache[i][res.curHeight] = jumpDownResult;
+            return jumpDownResult;
+        }
 
-        return jumpDownResult.completed && jumpDownResult.highestJump <= jumpUpResult.highestJump ? jumpDownResult
+        return cache[i][res.curHeight] = jumpDownResult.highestJump <= jumpUpResult.highestJump ? jumpDownResult
                 : jumpUpResult;
     }
 
@@ -94,7 +107,6 @@ public class SpidermanWorkout {
         int curHeight = 0;
         long sequence = 0;
         boolean completed = false;
-
 
         protected Result copy() {
             Result res = new Result();
